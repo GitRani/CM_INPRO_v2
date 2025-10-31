@@ -2,18 +2,23 @@
 
 CM V2 Version Migration을 위한 대규모 Structure Work
 ```
-CM_INPRO_V2/
+CM_INPRO_v2/
 ├── app/                                # 메인 FastAPI 애플리케이션 디렉토리
-│   ├── __init__.py                     # Python 패키지 초기화 파일
 │   ├── app.py                          # FastAPI 앱의 메인 엔트리 포인트. 미들웨어, 라우터, 예외 핸들러 등을 설정
 │   ├── common/                         # 여러 모듈에서 공통으로 사용되는 유틸리티 디렉토리
-│   │   ├── __init__.py
 │   │   ├── logging/                    # 로깅 설정을 담당하는 디렉토리
+│   │   │   ├── config.py
+│   │   │   └── handlers.py 
 │   │   └── redis/                      # Redis 연결 및 관련 유틸리티를 관리하는 디렉토리
+│   │   │   ├── cache.py
+│   │   │   ├── connection.py
+│   │   │   ├── log_reader.py
+│   │   │   └── logger.py 
 │   ├── config/                         # 애플리케이션 설정 디렉토리
 │   │   └── config.py                   # 환경 변수 로드 및 애플리케이션의 주요 설정을 관리
 │   ├── core/                           # 애플리케이션의 핵심 로직 디렉토리
 │   │   ├── database.py                 # 데이터베이스 세션 생성 및 관리를 담당
+│   │   ├── security.py                
 │   │   └── dependencies.py             # FastAPI의 의존성 주입(Dependency Injection) 관련 로직 (예: 사용자 인증)
 │   ├── docs/                           # 문서, 데이터, 업로드된 파일 등을 저장하는 디렉토리
 │   │   ├── data/
@@ -22,7 +27,6 @@ CM_INPRO_V2/
 │   │   └── uploads/
 │   ├── modules/                        # 주요 비즈니스 로직을 포함하는 모듈 디렉토리
 │   │   ├── chat/                       # 챗봇 데이터 관리 관련 비즈니스 로직
-│   │   │   ├── __init__.py
 │   │   │   ├── answer_evaluator.py     # 챗봇 답변의 정오답을 평가하는 로직
 │   │   │   ├── answer_sheet_manager.py # 정오답 체크용 정답지를 관리하는 로직
 │   │   │   ├── data_transformer.py     # 운영 데이터를 분석 가능한 형태로 변환하는 로직
@@ -33,10 +37,11 @@ CM_INPRO_V2/
 │   │       │   ├── agent/
 │   │       │   │   └── rag_agent.py    # RAG 에이전트 및 그래프를 정의하는 로직
 │   │       │   ├── document_processing/
-│   │       │   │   ├── __init__.py
-│   │       │   │   ├── chunker_de.py # Document Intelligence를 사용한 문서 청킹 로직
-│   │       │   │   ├── chunker_di.py # Document Intelligence를 사용한 다른 방식의 청킹 로직
-│   │       │   │   └── chunker.py    # 일반 문서 청킹 로직
+│   │       │   │   ├── allegronx_chunker_de.py # Document Extractor를 사용한 문서 청킹 로직
+│   │       │   │   ├── allegronx_chunker_di.py # Document Intelligence를 사용한 다른 방식의 청킹 로직
+│   │       │   │   ├── background_tasks.py 
+│   │       │   │   ├── data_formatter.py 
+│   │       │   │   └── allegronx_chunker.py    # 일반 문서 청킹 로직
 │   │       │   ├── generate_query/
 │   │       │   │   ├── concatenate_bpmn_pdf.py # BPMN과 PDF를 합치는 유틸리티
 │   │       │   │   ├── generation_query.py     # 질문 생성의 메인 로직
@@ -46,13 +51,17 @@ CM_INPRO_V2/
 │   │       │   │       └── generate_question_prompt.yaml # 질문 생성을 위한 프롬프트
 │   │       │   └── vector_store/
 │   │       │       ├── clear_collection.py # Vector DB 컬렉션을 삭제하는 로직
+│   │       │       ├── create_collection.py 
+│   │       │       ├── embedding_service.py 
 │   │       │       └── embedding.py        # 텍스트를 임베딩하여 Vector DB에 저장하는 로직
 │   │       ├── models/
 │   │       │   └── yolov10x_best.pt        # YOLO 모델 가중치 파일
 │   │       └── utils/
+│   │           ├── delete_upload_file.py    
 │   │           ├── extract_settings.py     # 설정 추출 유틸리티
-│   │           ....
-│   │ 
+│   │           ├── Image2Text.py           # 이미지에서 텍스트를 추출하는 OCR 관련 로직
+│   │           ├── Pdf2Json.py             # PDF를 JSON 형태로 변환하는 로직
+│   │           └── PostProcessing.py       # 후처리 로직
 │   ├── routers/                        # API 엔드포인트를 정의하는 라우터 디렉토리
 │   │   ├── auth/                       # 인증 및 사용자 관리 관련 API 라우터
 │   │   │   └── views.py                # 인증/사용자 관련 웹 페이지를 렌더링하고 API를 처리
@@ -65,6 +74,7 @@ CM_INPRO_V2/
 │   │   │   ├── core.py                 # RAG 핵심 기능(채팅, 일괄처리) API
 │   │   │   ├── tasks.py                # 백그라운드 작업 상태 조회/취소 API
 │   │   │   └── views.py                # RAG 기능 관련 웹 페이지를 렌더링
+│   │   ├── etc.py                      
 │   │   └── utils.py                    # 여러 라우터에서 공용으로 사용하는 API (상태 체크, 로그 조회 등)
 │   ├── schema/                         # Pydantic 스키마(데이터 모델) 디렉토리
 │   │   ├── __init__.py
@@ -112,6 +122,7 @@ CM_INPRO_V2/
 │   ├── mysql-data/
 │   └── redis-data/
 ├── .gitignore                          # Git에서 추적하지 않을 파일 및 디렉토리 목록
+├── chatbot.code-workspace              # Visual Studio Code 작업공간 설정 파일
 ├── docker-compose.yml                  # Docker Compose를 이용한 다중 컨테이너 서비스 정의 파일
 ├── Dockerfile                          # FastAPI 애플리케이션의 Docker 이미지 빌드를 위한 설정 파일
 ├── nginx.conf                          # Nginx 리버스 프록시 서버 설정 파일
